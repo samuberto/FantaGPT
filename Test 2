@@ -1,0 +1,41 @@
+import streamlit as st
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+
+# Titolo
+st.title("FantaGPT")
+
+# Dati di esempio per allenare il modello
+data = pd.DataFrame({
+    "gol_casa": [2,1,0,3,2,1,4,0],
+    "gol_trasferta": [1,1,2,0,0,2,1,3],
+    "forma_casa": [3,2,1,4,3,2,5,1],
+    "forma_trasferta": [1,2,3,1,2,3,1,4],
+    "risultato": [1,0,2,1,1,2,1,2]
+})
+
+X = data[["gol_casa", "gol_trasferta", "forma_casa", "forma_trasferta"]]
+y = data["risultato"]
+
+model = RandomForestClassifier()
+model.fit(X, y)
+
+# Input utente
+st.subheader("Inserisci i dati della partita")
+
+gol_casa = st.number_input("Gol segnati in media dalla squadra di CASA", 0, 5, 1)
+gol_trasferta = st.number_input("Gol segnati in media dalla squadra in TRASFERTA", 0, 5, 1)
+forma_casa = st.number_input("Vittorie ultime 5 partite (CASA)", 0, 5, 2)
+forma_trasferta = st.number_input("Vittorie ultime 5 partite (TRASFERTA)", 0, 5, 2)
+
+if st.button("Calcola pronostico"):
+    pred = model.predict([[gol_casa, gol_trasferta, forma_casa, forma_trasferta]])[0]
+
+    if pred == 1:
+        st.success("🔮 Pronostico: Vittoria CASA (1)")
+    elif pred == 0:
+        st.info("🔮 Pronostico: Pareggio (X)")
+    else:
+        st.warning("🔮 Pronostico: Vittoria TRASFERTA (2)")
+
+st.caption("⚠️ Progetto educativo – non usare per scommesse")
